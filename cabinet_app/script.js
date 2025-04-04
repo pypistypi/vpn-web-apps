@@ -5,7 +5,13 @@ const progressRing = document.querySelector(".progress");
 
 const userId = window.Telegram.WebApp.initDataUnsafe.user?.id;
 
-const osConfigs = { ... }; // Конфигурации для iOS, Android, Windows
+console.log("User ID:", userId); // Отладка
+
+const osConfigs = {
+    ios: "Скачайте WireGuard из App Store и импортируйте конфигурацию.",
+    android: "Скачайте WireGuard из Google Play и добавьте конфигурацию.",
+    windows: "Скачайте WireGuard с официального сайта и импортируйте конфигурацию."
+};
 
 async function getUserData(userId) {
     if (!userId) {
@@ -18,7 +24,7 @@ async function getUserData(userId) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("User data:", data); // Для отладки
+        console.log("User data:", data);
         return data;
     } catch (error) {
         console.error("Fetch error:", error);
@@ -26,7 +32,12 @@ async function getUserData(userId) {
     }
 }
 
-function updateSubscriptionRing(status, daysLeft, duration) { ... } // Обновление кольца подписки
+function updateSubscriptionRing(status, daysLeft, duration) {
+    daysText.textContent = daysLeft === Infinity ? "∞" : daysLeft;
+    const circumference = 2 * Math.PI * 50;
+    const progress = status === "free" ? 0 : (daysLeft / duration) * circumference;
+    progressRing.style.strokeDasharray = `${progress} ${circumference}`;
+}
 
 async function init() {
     const userData = await getUserData(userId);
@@ -34,9 +45,14 @@ async function init() {
 
     buttons.forEach(button => {
         button.addEventListener("click", () => {
+            console.log("OS button clicked:", button.dataset.os); // Отладка
             const os = button.dataset.os;
             const config = osConfigs[os];
-            osContent.innerHTML = `...`; // Кнопки и инструкции
+            osContent.innerHTML = `
+                <p>${config}</p>
+                <button class="download-btn">Скачать конфигурацию</button>
+                <p class="instruction">Инструкция: Импортируйте файл в приложение WireGuard.</p>
+            `;
         });
     });
 }
