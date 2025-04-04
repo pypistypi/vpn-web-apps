@@ -6,6 +6,8 @@ const planInfo = document.getElementById("plan-info");
 const payBtn = document.getElementById("pay-btn");
 const successMessage = document.getElementById("success-message");
 
+console.log("User ID:", userId, "Tariff:", tariff); // Отладка
+
 if (tariff === "month") {
     planInfo.textContent = "Тариф: 1 месяц - 300 рублей";
 } else if (tariff === "year") {
@@ -16,6 +18,7 @@ if (tariff === "month") {
 }
 
 payBtn.addEventListener("click", async () => {
+    console.log("Pay button clicked"); // Отладка
     try {
         const response = await fetch("https://pypistypi.ru/payment_callback", {
             method: "POST",
