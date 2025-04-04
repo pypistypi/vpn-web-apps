@@ -5,12 +5,42 @@ const progressRing = document.querySelector(".progress");
 
 const userId = window.Telegram.WebApp.initDataUnsafe.user?.id;
 
-console.log("User ID:", userId); // Отладка
+console.log("User ID:", userId);
 
 const osConfigs = {
-    ios: "Скачайте WireGuard из App Store и импортируйте конфигурацию.",
-    android: "Скачайте WireGuard из Google Play и добавьте конфигурацию.",
-    windows: "Скачайте WireGuard с официального сайта и импортируйте конфигурацию."
+    ios: {
+        app: "Streisand",
+        storeLink: "https://apps.apple.com/us/app/streisand/id6450534064",
+        instruction: `
+            <p>1. Скачайте Streisand из App Store.</p>
+            <p>2. Скопируйте конфигурацию через "Получить VPN".</p>
+            <p>3. Вставьте конфиг в приложение.</p>
+            <img src="assets/ios-screenshot1.png" class="screenshot" alt="Добавление конфига">
+            <img src="assets/ios-screenshot2.png" class="screenshot" alt="Профиль VPN">
+        `
+    },
+    android: {
+        app: "NekoBox",
+        storeLink: "https://play.google.com/store/apps/details?id=moe.nb4a&hl=ru",
+        instruction: `
+            <p>1. Скачайте NekoBox из Google Play.</p>
+            <p>2. Скопируйте конфигурацию через "Получить VPN".</p>
+            <p>3. Вставьте конфиг в приложение.</p>
+            <img src="assets/android-screenshot1.png" class="screenshot" alt="Создание профиля">
+            <img src="assets/android-screenshot2.png" class="screenshot" alt="Подключение">
+        `
+    },
+    windows: {
+        app: "Hiddify",
+        downloadLink: "https://hiddify.com/",
+        instruction: `
+            <p>1. Скачайте Hiddify с официального сайта.</p>
+            <p>2. Скопируйте конфигурацию через "Получить VPN".</p>
+            <p>3. Вставьте конфиг в приложение.</p>
+            <img src="assets/windows-screenshot1.png" class="screenshot" alt="Добавление сервера">
+            <img src="assets/windows-screenshot2.png" class="screenshot" alt="Подключение">
+        `
+    }
 };
 
 async function getUserData(userId) {
@@ -25,18 +55,29 @@ async function getUserData(userId) {
         }
         const data = await response.json();
         console.log("User data:", data);
-        return data;
+        return {
+            config: data.config || "Подписка неактивна",
+            status: data.status || "free",
+            daysLeft: data.days_left || 0,
+            duration: data.duration || 0
+        };
     } catch (error) {
         console.error("Fetch error:", error);
-        return { config: "Ошибка загрузки данных", status: "free", daysLeft: 0, duration: 0 };
+        return { config: "Ошибка подключения", status: "free", daysLeft: 0, duration: 0 };
     }
 }
 
 function updateSubscriptionRing(status, daysLeft, duration) {
-    daysText.textContent = daysLeft === Infinity ? "∞" : daysLeft;
-    const circumference = 2 * Math.PI * 50;
-    const progress = status === "free" ? 0 : (daysLeft / duration) * circumference;
-    progressRing.style.strokeDasharray = `${progress} ${circumference}`;
+    if (status === "free") {
+        daysText.textContent = "∞";
+        progressRing.style.strokeDasharray = "314 314";
+    } else {
+        daysText.textContent = daysLeft;
+        const totalDays = duration === 30 ? 30 : 365;
+        const percentage = (daysLeft / totalDays) * 100;
+        const dashLength = (percentage / 100) * 314;
+        progressRing.style.strokeDasharray = `${dashLength} 314`;
+    }
 }
 
 async function init() {
@@ -44,14 +85,18 @@ async function init() {
     updateSubscriptionRing(userData.status, userData.daysLeft, userData.duration);
 
     buttons.forEach(button => {
-        button.addEventListener("click", () => {
-            console.log("OS button clicked:", button.dataset.os); // Отладка
+        button.addEventListener("click", async () => {
+            console.log("OS button clicked:", button.dataset.os);
             const os = button.dataset.os;
             const config = osConfigs[os];
             osContent.innerHTML = `
-                <p>${config}</p>
-                <button class="download-btn">Скачать конфигурацию</button>
-                <p class="instruction">Инструкция: Импортируйте файл в приложение WireGuard.</p>
+                <button class="download-btn" onclick="window.open('${config.storeLink || config.downloadLink}', '_blank')">
+                    Скачать ${config.app}
+                </button>
+                <button class="vpn-btn" onclick="navigator.clipboard.writeText('${userData.config}'); alert('Конфигурация скопирована!')">
+                    Получить VPN
+                </button>
+                <div class="instruction">${config.instruction}</div>
             `;
         });
     });
