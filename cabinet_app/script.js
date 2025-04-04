@@ -56,7 +56,7 @@ async function getUserData(userId) {
         const data = await response.json();
         console.log("User data:", data);
         return {
-            config: data.config || "Подписка неактивна",
+            config: data.config || "Конфигурация не сгенерирована",
             status: data.status || "free",
             daysLeft: data.days_left || 0,
             duration: data.duration || 0
