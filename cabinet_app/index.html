@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет VPN</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Личный кабинет</h1>
+        <div class="subscription-ring">
+            <svg class="ring" width="120" height="120">
+                <circle class="background" cx="60" cy="60" r="50" />
+                <circle class="progress" cx="60" cy="60" r="50" />
+            </svg>
+            <div class="days-left">
+                <span id="days-text">∞</span>
+                <span class="label">дней</span>
+            </div>
+        </div>
+        <div class="os-buttons">
+            <button class="os-btn" data-os="ios"><img src="assets/ios.png" alt="iOS"> iOS</button>
+            <button class="os-btn" data-os="android"><img src="assets/android.png" alt="Android"> Android</button>
+            <button class="os-btn" data-os="windows"><img src="assets/windows.png" alt="Windows"> Windows</button>
+        </div>
+        <div class="content" id="os-content"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
