@@ -20,6 +20,11 @@ if (tariff === "month" && price) {
 
 payBtn.addEventListener("click", async () => {
     console.log("Pay button clicked, sending request...");
+    if (!userId || !tariff) {
+        console.error("Missing userId or tariff");
+        alert("Ошибка: данные пользователя или тариф не найдены");
+        return;
+    }
     try {
         const response = await fetch("https://pypistypi.ru/payment_callback", {
             method: "POST",
@@ -34,10 +39,14 @@ payBtn.addEventListener("click", async () => {
         if (data.status === "success") {
             payBtn.style.display = "none";
             successMessage.style.display = "block";
-            window.Telegram.WebApp.close();  // Закрыть Web App после оплаты
+            window.Telegram.WebApp.close(); // Закрываем Web App
+        } else {
+            console.error("Payment failed:", data);
+            alert("Ошибка оплаты, попробуйте позже");
         }
     } catch (error) {
         console.error("Payment error:", error);
+        alert("Ошибка подключения к серверу");
     }
 });
 
