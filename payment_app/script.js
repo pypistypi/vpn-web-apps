@@ -19,7 +19,7 @@ if (tariff === "month" && price) {
 }
 
 payBtn.addEventListener("click", async () => {
-    console.log("Pay button clicked");
+    console.log("Pay button clicked, sending request...");
     try {
         const response = await fetch("https://pypistypi.ru/payment_callback", {
             method: "POST",
@@ -34,6 +34,7 @@ payBtn.addEventListener("click", async () => {
         if (data.status === "success") {
             payBtn.style.display = "none";
             successMessage.style.display = "block";
+            window.Telegram.WebApp.close();  // Закрыть Web App после оплаты
         }
     } catch (error) {
         console.error("Payment error:", error);
